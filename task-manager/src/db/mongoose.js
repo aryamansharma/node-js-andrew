@@ -1,6 +1,6 @@
 const mongoose = require('mongoose')
 
-mongoose.connect('mongodb://127.0.0.1:27017/task-manager-api', {
+mongoose.connect('mongodb+srv://aryamansharma1816:yw8hPcNljZm1WpMw@cluster0.yfdapul.mongodb.net/task_app?retryWrites=true&w=majority&appName=Cluster0', {
     useNewUrlParser: true,
     useCreateIndex: true,
     useFindAndModify: false
