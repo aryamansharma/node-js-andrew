@@ -30,7 +30,7 @@ const userSchema = new mongoose.Schema({
             if (value.toLowerCase().includes('password')) {
                 throw new Error('Password cannot contain "password"')
             }
-        }
+        },
     },
     age: {
         type: Number,
@@ -44,7 +44,7 @@ const userSchema = new mongoose.Schema({
     tokens: [{
         token: {
             type: String,
-            required: true
+            required: true,
         }
     }]
 })
