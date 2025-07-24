@@ -6,8 +6,8 @@ dotenv.config({ path: './config.env' });
 
 require('./db/db');
 
-const taskRouter = require('./routes/tasks');
-const userRouter = require('./routes/uers');
+const taskRouter = require('./routes/task-router');
+const userRouter = require('./routes/uer-router');
 
 const app = express();
 const port = process.env.PORT || 3000;
