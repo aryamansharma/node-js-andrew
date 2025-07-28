@@ -1,5 +1,7 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
+const bcrypt = require('bcrypt');
+const jsonWebToken = require('jsonwebtoken');
 
 const userSchema = mongoose.Schema({
     name: {
@@ -31,9 +33,53 @@ const userSchema = mongoose.Schema({
         type: Number,
         default: 0,
         min: [1, 'Age should be a valid number']
-    }
+    },
+    tokens: [{
+        token: {
+            type: String,
+            required: true
+        }
+    }]
 });
 
-const User = mongoose.Model('User', userSchema);
+userSchema.statics.findByCredentials = async function (email, password) {
+    const User = this;
+    const user = await User.findOne({ email });
+
+    if (!user) {
+        throw new Error('Username or password is wrong');
+    }
+
+    const isPasswordCorrect = await bcrypt.compare(password, user.password);
+
+    if (!isPasswordCorrect) {
+        throw new Error('Username or password is wrong');
+    }
+
+    return user;
+}
+
+userSchema.methods.generateAuthToken = async function () {
+    const user = this;
+    const jwt = jsonWebToken.sign({ _id: user._id }, process.env.SECRET, {
+        expiresIn: process.env.JWT_EXPIRES_IN
+    });
+
+    user.tokens.push({ token: jwt });
+
+    return jwt
+}
+
+userSchema.pre('save', async function (next) {
+    const user = this;
+
+    if (user.isModified('password')) {
+        user.password = await bcrypt.hash(user.password, 12);
+    }
+
+    next();
+});
+
+const User = mongoose.model('User', userSchema);
 
 module.exports = User;
