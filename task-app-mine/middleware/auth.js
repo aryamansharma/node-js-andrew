@@ -22,7 +22,7 @@ const auth = async (req, res, next) => {
         if (!user) throw new Error('No user found');
 
         req.user = user;
-        // req.token = token
+        req.token = token;
         next();
     } catch (err) {
         res.status(401).json({
