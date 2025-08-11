@@ -15,6 +15,10 @@ const taskSchema = mongoose.Schema({
         required: true,
         ref: 'User'
     }
+}, {
+    //  this schema option will add 'createdAt' and 'updatedAt' in the documents with the timestamps of creating or updation, 
+    // default value of this timestamp is false 
+    timestamps: true
 });
 
 const Task = mongoose.model('Task', taskSchema);
