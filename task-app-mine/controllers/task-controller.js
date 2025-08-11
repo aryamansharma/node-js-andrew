@@ -2,12 +2,18 @@ const Task = require('../models/task-model');
 
 exports.getAllTasks = async (req, res) => {
     try {
-        const tasks = await Task.find();
+        // one way for getting logged in users tasks
+        // const tasks = await Task.find({ owner: req.user._id });
+
+        // another way is by using populate
+        // .execPopulate method is not needed anymore.
+        await req.user.populate('tasks');
+
         res.status(200).json({
-            data: tasks
+            data: req.user.tasks
         });
     } catch (err) {
-        es.send(500).json({
+        res.send(500).json({
             message: 'Something went wrong'
         });
     }
@@ -15,7 +21,10 @@ exports.getAllTasks = async (req, res) => {
 
 exports.createTask = async (req, res) => {
     try {
-        const task = await Task.create(req.body);
+        const task = await Task.create({
+            ...req.body,
+            owner: req.user._id
+        });
         res.status(200).json({
             data: task
         });
@@ -29,7 +38,10 @@ exports.createTask = async (req, res) => {
 exports.getTask = async (req, res) => {
     try {
         const id = req.params.id;
-        const task = await Task.findById(id);
+        const task = await Task.findOne({ _id: id, owner: req.user._id });
+
+        if (!task) res.status(404).send();
+
         res.status(200).json({
             data: task
         });
@@ -42,11 +54,27 @@ exports.getTask = async (req, res) => {
 
 exports.updateTask = async (req, res) => {
     try {
-        const id = req.params.id;
-        const task = await Task.findByIdAndUpdate(id, req.body, {
-            runValidators: true,
-            new: true
+        const reqBody = req.body;
+        const updates = Object.keys(reqBody);
+        const allowedUpdates = ['description', 'completed'];
+        const isValidOperation = updates.every((update) => allowedUpdates.includes(update));
+
+        if (!isValidOperation) return res.status(400).json({
+            message: 'Invalid operation'
         });
+
+        const id = req.params.id;
+        const task = await Task.findOne({ _id: id, owner: req.user._id });
+
+        if (!task) res.status(404).json();
+
+
+        updates.forEach((update) => {
+            task[update] = reqBody[update];
+        });
+
+        await task.save();
+
         res.status(200).json({
             success: 'SUCCESS',
             data: task
@@ -57,14 +85,14 @@ exports.updateTask = async (req, res) => {
             message: 'Something went wrong'
         });
     }
-
-
 }
 
 exports.deleteTask = async (req, res) => {
     try {
         const id = req.params.id;
-        const task = await Task.findByIdAndDelete(id);
+        const task = await Task.findOneAndDelete({ _id: id, owner: req.user._id });
+
+        if (!task) res.status(404).send();
         res.status(200).json({
             data: task
         });

@@ -10,7 +10,6 @@ router.use(auth);
 
 router.route('/logout').post(userController.logout);
 router.route('/logoutAll').post(userController.logoutAll);
-router.route('/me').get(userController.getProfile);
-router.route('/:id').get(userController.getUser).delete(userController.deleteUser).patch(userController.updateUser);
+router.route('/me').get(userController.getProfile).delete(userController.deleteUser).patch(userController.updateUser);
 
 module.exports = router;
