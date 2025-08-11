@@ -6,17 +6,34 @@ exports.getAllTasks = async (req, res) => {
         // const tasks = await Task.find({ owner: req.user._id });
 
         const match = {};
+        const sort = {};
 
+        // for manipulating match object for filtering
         if (req.query.completed === 'true' || req.query.completed === 'false') {
-            match.completed = JSON.parse(req.query.completed);
+            match.completed = req.query.completed === 'true';
         }
 
+        // for manipulating sort object for sorting
+        if (req.query.sortBy) {
+            const parts = req.query.sortBy.split(':');
+            // we are sending 'asc' or 'desc' options for sorting
+            sort[parts[0]] = parts[1] === 'asc' ? 1 : -1; // here 1 means the field for which we are adding sorting feature, will be sorted in ascending order and -1 means descending
+        }
 
         // another way is by using populate
-        // .execPopulate method is not needed anymore.
+        const limit = parseInt(req.query.limit);
+        const page = parseInt(req.query.page);
+        const skip = (page - 1) * limit;
+
         await req.user.populate({
             path: 'tasks',
-            match // this match is a filter object, like we pass in the find methods to filter data
+            match, // this match is a filter object, like we pass in the find methods to filter data
+            options: { // this options object can be used for pagination and sorting
+                limit,
+                skip,
+                sort // this sort is a sorting object, if passed an empty object that means, 
+                // no sorting is applied
+            }
         });
 
         res.status(200).json({
