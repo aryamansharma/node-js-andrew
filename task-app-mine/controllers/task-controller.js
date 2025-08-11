@@ -16,7 +16,7 @@ exports.getAllTasks = async (req, res) => {
         // .execPopulate method is not needed anymore.
         await req.user.populate({
             path: 'tasks',
-            match
+            match // this match is a filter object, like we pass in the find methods to filter data
         });
 
         res.status(200).json({
