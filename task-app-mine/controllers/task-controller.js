@@ -5,9 +5,19 @@ exports.getAllTasks = async (req, res) => {
         // one way for getting logged in users tasks
         // const tasks = await Task.find({ owner: req.user._id });
 
+        const match = {};
+
+        if (req.query.completed === 'true' || req.query.completed === 'false') {
+            match.completed = JSON.parse(req.query.completed);
+        }
+
+
         // another way is by using populate
         // .execPopulate method is not needed anymore.
-        await req.user.populate('tasks');
+        await req.user.populate({
+            path: 'tasks',
+            match
+        });
 
         res.status(200).json({
             data: req.user.tasks
