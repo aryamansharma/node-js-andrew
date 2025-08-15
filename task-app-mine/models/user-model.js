@@ -40,7 +40,10 @@ const userSchema = mongoose.Schema({
             type: String,
             required: true
         }
-    }]
+    }],
+    avatar: {
+        type: Buffer // we use this 'Buffer' type for files
+    }
 }, {
     timestamps: true
 });
@@ -103,6 +106,7 @@ userSchema.methods.getPublicProfile = function () {
 
     delete userObj.tokens;
     delete userObj.password;
+    delete userObj.avatar;
 
     return userObj;
 }

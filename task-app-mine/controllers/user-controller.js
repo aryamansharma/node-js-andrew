@@ -1,4 +1,5 @@
 const User = require('../models/user-model');
+const sharp = require('sharp');
 
 // method for hiding password and tokens array,
 // we can call this method just before sending user as a response.
@@ -117,6 +118,60 @@ exports.deleteUser = async (req, res) => {
         res.status(200).json({
             user: req.user.getPublicProfile()
         });
+    } catch (err) {
+        res.status(500).json({
+            message: 'something went wrong'
+        });
+    }
+}
+
+// this route we can use to add and update user profile picture
+exports.fileUpload = async (req, res) => {
+    try {
+
+        // here we are using sharp to modify our avatar image, so converting the format of the image to png, no matter what format user uploads and resizing it and then using 
+        // the 'toBuffer' method converting it back to a buffer.
+        const buffer = await sharp(req.file.buffer).resize({ width: 250, height250 }).png().toBuffer();
+        req.user.avatar = buffer;
+        await req.user.save();
+        res.status(200).send();
+    } catch (err) {
+        res.status(500).json({
+            message: 'something went wrong'
+        });
+    }
+}
+
+exports.deleteAvatar = async (req, res) => {
+    try {
+        req.user.avatar = undefined;
+        await req.user.save();
+        res.status(200).send();
+    } catch (err) {
+        res.status(500).json({
+            message: 'something went wrong'
+        });
+    }
+}
+
+exports.fileUploadErrorHandler = (err, rerq, res, next) => {
+    res.status(400).json({
+        error: err.message
+    });
+}
+
+exports.getAvatar = async (req, res) => {
+    try {
+        const user = await User.findById(req.params.id);
+
+        if (!user || !user.avatar) {
+            throw new Error();
+        }
+
+        // this line is for telling the client what kind of data they are getting back, here we are sending and image of type png
+        // here we are using png becuase we are only storing avatar of type png, so it makes sense to send back png type
+        res.set('Content-Type', 'image/png');
+        res.status(200).send(user.avatar);
     } catch (err) {
         res.status(500).json({
             message: 'something went wrong'
