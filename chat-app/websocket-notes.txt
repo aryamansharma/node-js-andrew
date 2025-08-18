@@ -1,0 +1,16 @@
+1. websocket is a protocol.
+2. it is enitrely different form HTTP protocol.
+4. difference is :
+    a. in HTTP protocol we stablish a connection from clint to the server, and whenever the client needs something from the server, it would make a req to the server
+        which would send a response back the client. There was no way that the server would make a connection to the client and send something on its own.
+    
+    b. in websocket protocol, we have a full-duplec communication, which simply means we that we stablish a connection from client to the server and back from server to the client,
+        and it can stay connected as long as it needs to. we have a persistent connection.
+
+    c. websocket protocol is really helpful in building something like real time chat applications beacuse :
+        * suppose USER_1 sends a text to the server to send send the same text to 3 other users, in HTTP it would not be possible USER_1 can make the req to the server but the other 
+            cannot recieve the text as using HTTP the server will not send anything on its own, but if we use websocket protocol , all the other users will recieve the texts,
+            as websockets stablish a 2 way connection meaning the server can send the response on its own.
+
+5. we can use 'socket.io' npm package to add support for websocket in our app.
+

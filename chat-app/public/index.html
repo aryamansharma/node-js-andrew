@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <h1>Chat app</h1>
+    <form>
+        <input type="text" name="welcomeText" id="inputField">
+        <button id="sendBtn">send</button>
+    </form>
+
+    <!-- for loading client side of the socket library we import this file -->
+    <script src="/socket.io/socket.io.js"></script>
+    <!-- and then this import is also needed for loading client side of the socket lib and from it the 1st line is needed of this file -->
+    <script src="./chat.js"></script>
+</body>
+
+</html>
