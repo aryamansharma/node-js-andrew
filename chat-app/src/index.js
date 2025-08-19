@@ -2,6 +2,7 @@ const path = require('path');
 const express = require('express');
 const http = require('http');
 const socketio = require('socket.io');
+const Filter = require('bad-words'); // this is a package we can use to check for any bad words
 
 const PORT = process.env.PORT || 3000;
 
@@ -25,13 +26,19 @@ io.on('connection', (socket) => {
     socket.broadcast.emit('message', 'A new user has joined');
 
     // by using below line we listen a custom event which the client has emitted
-    socket.on('sendMessage', (text) => {
+    socket.on('sendMessage', (text, callback) => {
         // io.emit will emit event for all the connections
+        const filter = new Filter();
+        // this callback parameter is used to send acknowledgment to the sender, basically when we call this callback, it will run the 3rd arguement 
+        // of the emitter
+        if (filter.isProfane(text) && typeof callback === 'function') return callback('No bad words are allowed');
         io.emit('message', text);
+        if (typeof callback === 'function') callback();
     });
 
-    socket.on('sendLocation', (coords) => {
+    socket.on('sendLocation', (coords, callback) => {
         io.emit('message', `https://google.com/maps?q=${coords.latitude},${coords.longitude}`);
+        callback();
     });
 
     // this way we can run some code when the user gets disconnected

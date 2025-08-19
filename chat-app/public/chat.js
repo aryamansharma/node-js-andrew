@@ -8,7 +8,13 @@ sendBtn.addEventListener('click', (event) => {
     event.preventDefault();
 
     // by using below line we emit a custom event which the server can listen on to with the same name
-    socket.emit('sendMessage', inputField.value);
+    // 3rd arguement is the callback which will run when the server makes the acknowledgement of the event
+    socket.emit('sendMessage', inputField.value, (err) => {
+        if (err) {
+            return console.log(err);
+        }
+        console.log('Message delivered');
+    });
 });
 
 sendLocationBtn.addEventListener('click', (e) => {
@@ -22,7 +28,9 @@ sendLocationBtn.addEventListener('click', (e) => {
     navigator.geolocation.getCurrentPosition((position) => {
         const latitude = position.coords.latitude;
         const longitude = position.coords.longitude;
-        socket.emit('sendLocation', { latitude, longitude });
+        socket.emit('sendLocation', { latitude, longitude }, () => {
+            console.log('Location shared');
+        });
     });
 });
 
