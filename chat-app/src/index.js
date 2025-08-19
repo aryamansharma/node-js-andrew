@@ -30,6 +30,10 @@ io.on('connection', (socket) => {
         io.emit('message', text);
     });
 
+    socket.on('sendLocation', (coords) => {
+        io.emit('message', `https://google.com/maps?q=${coords.latitude},${coords.longitude}`);
+    });
+
     // this way we can run some code when the user gets disconnected
     socket.on('disconnect', () => {
         // here we are using io.emit because the user has already left and we can just all the remaning connections of his disconnection
