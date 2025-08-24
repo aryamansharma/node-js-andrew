@@ -27,11 +27,13 @@ io.on('connection', (socket) => {
 
     // by using below line we listen a custom event which the client has emitted
     socket.on('sendMessage', (text, callback) => {
-        // io.emit will emit event for all the connections
         const filter = new Filter();
-        // this callback parameter is used to send acknowledgment to the sender, basically when we call this callback, it will run the 3rd arguement 
-        // of the emitter
-        if (filter.isProfane(text) && typeof callback === 'function') return callback('No bad words are allowed');
+        if (filter.isProfane(text) && typeof callback === 'function') {
+            // this callback parameter is used to send acknowledgment to the sender, basically when we call this callback, it will run the 3rd arguement 
+            // of the emitter
+            return callback('No bad words are allowed');
+        }
+        // io.emit will emit event for all the connections
         io.emit('message', text);
         if (typeof callback === 'function') callback();
     });

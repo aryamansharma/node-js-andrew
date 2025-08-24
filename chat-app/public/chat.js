@@ -7,9 +7,16 @@ const sendLocationBtn = document.querySelector('#send-location');
 sendBtn.addEventListener('click', (event) => {
     event.preventDefault();
 
+    inputField.setAttribute('disabled', 'disabled');
+    sendBtn.setAttribute('disabled', 'disabled');
+
     // by using below line we emit a custom event which the server can listen on to with the same name
     // 3rd arguement is the callback which will run when the server makes the acknowledgement of the event
     socket.emit('sendMessage', inputField.value, (err) => {
+        inputField.removeAttribute('disabled');
+        sendBtn.removeAttribute('disabled');
+        inputField.value = '';
+        inputField.focus();
         if (err) {
             return console.log(err);
         }
@@ -25,10 +32,15 @@ sendLocationBtn.addEventListener('click', (e) => {
         return alert('Your browser does not support geolcation');
     }
 
+    sendLocationBtn.setAttribute('disabled', 'disabled');
+
+    // this 'getCurrentPosition' method performs an asynchronous operation
     navigator.geolocation.getCurrentPosition((position) => {
+
         const latitude = position.coords.latitude;
         const longitude = position.coords.longitude;
         socket.emit('sendLocation', { latitude, longitude }, () => {
+            sendLocationBtn.removeAttribute('disabled');
             console.log('Location shared');
         });
     });
