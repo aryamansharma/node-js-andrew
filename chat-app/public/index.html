@@ -1,24 +1,26 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Chat App</title>
+    <link rel="icon" href="/img/favicon.png">
+    <link rel="stylesheet" href="/css/styles.min.css">
 </head>
 
 <body>
-    <h1>Chat app</h1>
-    <form>
-        <input type="text" name="welcomeText" id="inputField">
-        <button id="sendBtn">send</button>
-    </form>
-    <button id="send-location">Send location</button>
-
-    <!-- for loading client side of the socket library we import this file -->
-    <script src="/socket.io/socket.io.js"></script>
-    <!-- and then this import is also needed for loading client side of the socket lib and from it the 1st line is needed of this file -->
-    <script src="./chat.js"></script>
+    <div class="centered-form">
+        <div class="centered-form_box">
+            <h1>Join</h1>
+            <!-- as we are not using ang METHOD for form, so the username and room value will be added to the URL as query parameters -->
+            <form action="/chat.html">
+                <label>Display name</label>
+                <input type="text" name="username" placeholder="Display name" required>
+                <label>Room</label>
+                <input type="text" name="room" placeholder="Room" required>
+                <button>Join</button>
+            </form>
+        </div>
+    </div>
 </body>
 
 </html>

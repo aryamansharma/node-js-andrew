@@ -3,6 +3,8 @@ const express = require('express');
 const http = require('http');
 const socketio = require('socket.io');
 const Filter = require('bad-words'); // this is a package we can use to check for any bad words
+const { generateMessageObj, generateLocationMessage } = require('./utils/utils');
+const { Console } = require('console');
 
 const PORT = process.env.PORT || 3000;
 
@@ -20,10 +22,22 @@ io.on('connection', (socket) => {
 
     // by using below line we emit a custom event which the client can listen on to with the same name
     // socket.emit will emit event for that particular connection
-    socket.emit('message', 'Welcome');
+    // socket.emit('message', generateMessageObj('Welcome'));
 
     // this broadcast will emit an event for all the connections excep the one triggering it
-    socket.broadcast.emit('message', 'A new user has joined');
+    // socket.broadcast.emit('message', generateMessageObj('A new user has joined'));
+
+    socket.on('join', ({ username, room }) => {
+        socket.join(room); // this join method allows a user to join a specific room
+
+        socket.emit('message', generateMessageObj('Welcome'));
+
+        // below event using the to method will emit for the specific room passed as the parameter , so it will send the message to all the members of the room.
+        // io.to(room).emit('message', generateMessageObj('Welcome'));
+
+        // below event using the to method will emit for the specific room passed as the parameter , so it will send the message to all the members of the room except himeself
+        socket.broadcast.to(room).emit('message', generateMessageObj(`${username} has joined!`));
+    });
 
     // by using below line we listen a custom event which the client has emitted
     socket.on('sendMessage', (text, callback) => {
@@ -34,19 +48,19 @@ io.on('connection', (socket) => {
             return callback('No bad words are allowed');
         }
         // io.emit will emit event for all the connections
-        io.emit('message', text);
+        io.emit('message', generateMessageObj(text));
         if (typeof callback === 'function') callback();
     });
 
     socket.on('sendLocation', (coords, callback) => {
-        io.emit('message', `https://google.com/maps?q=${coords.latitude},${coords.longitude}`);
+        io.emit('locationMessage', generateLocationMessage(`https://google.com/maps?q=${coords.latitude},${coords.longitude}`));
         callback();
     });
 
     // this way we can run some code when the user gets disconnected
     socket.on('disconnect', () => {
         // here we are using io.emit because the user has already left and we can just all the remaning connections of his disconnection
-        io.emit('message', 'A user has left')
+        io.emit('message', generateMessageObj('A user has left'));
     });
 });
 
