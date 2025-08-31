@@ -1,5 +1,6 @@
-const generateMessageObj = (text) => {
+const generateMessageObj = (username, text) => {
     return {
+        username,
         text,
         createAt: new Date().getTime()
         // this method will conver the data into unix timestamp,
@@ -7,8 +8,9 @@ const generateMessageObj = (text) => {
     }
 }
 
-const generateLocationMessage = (url) => {
+const generateLocationMessage = (username, url) => {
     return {
+        username,
         url,
         createAt: new Date().getTime()
     }

@@ -28,6 +28,7 @@ io.on('connection', (socket) => {
     // socket.broadcast.emit('message', generateMessageObj('A new user has joined'));
 
     socket.on('join', ({ username, room }, callback) => {
+        // socket.id will give a unique id for each connection
         const { error, user } = addUser({ id: socket.id, username, room });
 
         if (error) {
@@ -36,13 +37,13 @@ io.on('connection', (socket) => {
 
         socket.join(user.room); // this join method allows a user to join a specific room
 
-        socket.emit('message', generateMessageObj('Welcome'));
+        socket.emit('message', generateMessageObj('Admin', 'Welcome'));
 
         // below event using the to method will emit for the specific room passed as the parameter , so it will send the message to all the members of the room.
         // io.to(room).emit('message', generateMessageObj('Welcome'));
 
         // below event using the to method will emit for the specific room passed as the parameter , so it will send the message to all the members of the room except himeself
-        socket.broadcast.to(user.room).emit('message', generateMessageObj(`${user.username} has joined!`));
+        socket.broadcast.to(user.room).emit('message', generateMessageObj('Admin', `${user.username} has joined!`));
 
         callback();
     });
@@ -56,12 +57,14 @@ io.on('connection', (socket) => {
             return callback('No bad words are allowed');
         }
         // io.emit will emit event for all the connections
-        io.emit('message', generateMessageObj(text));
+        const user = getuser(socket.id);
+        io.to(user.room).emit('message', generateMessageObj(user.username, text));
         if (typeof callback === 'function') callback();
     });
 
     socket.on('sendLocation', (coords, callback) => {
-        io.emit('locationMessage', generateLocationMessage(`https://google.com/maps?q=${coords.latitude},${coords.longitude}`));
+        const user = getuser(socket.id);
+        io.to(user.room).emit('locationMessage', generateLocationMessage(user.username, `https://google.com/maps?q=${coords.latitude},${coords.longitude}`));
         callback();
     });
 
@@ -70,7 +73,7 @@ io.on('connection', (socket) => {
         const user = removeUser(socket.id);
 
         if (user) {
-            io.to(user.room).emit('message', generateMessageObj(`${user.username} has left`));
+            io.to(user.room).emit('message', generateMessageObj('Admin', `${user.username} has left`));
         }
 
         // here we are using io.emit because the user has already left and we can just all the remaning connections of his disconnection

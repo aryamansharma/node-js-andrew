@@ -60,10 +60,9 @@ sendLocationBtn.addEventListener('click', (e) => {
 
 // by using below line we listen a custom event which the server has emitted
 socket.on('message', (message) => {
-    console.log(message);
-
     // setting the message in the template , 2nd option is object in which key will be keys we are using in the html, and their values will be the value we want to insert
     const html = Mustache.render($messageTemplate, {
+        username: message.username,
         message: message.text,
         createdAt: moment(message.createdAt).format('h:mm a')
     });
@@ -71,8 +70,8 @@ socket.on('message', (message) => {
 });
 
 socket.on('locationMessage', (urlObj) => {
-    console.log(urlObj)
     const html = Mustache.render($locationMessageTemplate, {
+        username: urlObj.username,
         url: urlObj.url,
         createdAt: moment(urlObj.createdAt).format('h:mm a')
     });
