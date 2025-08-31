@@ -3,8 +3,8 @@ const express = require('express');
 const http = require('http');
 const socketio = require('socket.io');
 const Filter = require('bad-words'); // this is a package we can use to check for any bad words
-const { generateMessageObj, generateLocationMessage } = require('./utils/utils');
-const { Console } = require('console');
+const { generateMessageObj, generateLocationMessage } = require('./utils/messages');
+const { addUser, getUsersInRoom, getuser, removeUser } = require('./utils/users');
 
 const PORT = process.env.PORT || 3000;
 
@@ -27,8 +27,14 @@ io.on('connection', (socket) => {
     // this broadcast will emit an event for all the connections excep the one triggering it
     // socket.broadcast.emit('message', generateMessageObj('A new user has joined'));
 
-    socket.on('join', ({ username, room }) => {
-        socket.join(room); // this join method allows a user to join a specific room
+    socket.on('join', ({ username, room }, callback) => {
+        const { error, user } = addUser({ id: socket.id, username, room });
+
+        if (error) {
+            return callback(error);
+        }
+
+        socket.join(user.room); // this join method allows a user to join a specific room
 
         socket.emit('message', generateMessageObj('Welcome'));
 
@@ -36,7 +42,9 @@ io.on('connection', (socket) => {
         // io.to(room).emit('message', generateMessageObj('Welcome'));
 
         // below event using the to method will emit for the specific room passed as the parameter , so it will send the message to all the members of the room except himeself
-        socket.broadcast.to(room).emit('message', generateMessageObj(`${username} has joined!`));
+        socket.broadcast.to(user.room).emit('message', generateMessageObj(`${user.username} has joined!`));
+
+        callback();
     });
 
     // by using below line we listen a custom event which the client has emitted
@@ -59,8 +67,14 @@ io.on('connection', (socket) => {
 
     // this way we can run some code when the user gets disconnected
     socket.on('disconnect', () => {
+        const user = removeUser(socket.id);
+
+        if (user) {
+            io.to(user.room).emit('message', generateMessageObj(`${user.username} has left`));
+        }
+
         // here we are using io.emit because the user has already left and we can just all the remaning connections of his disconnection
-        io.emit('message', generateMessageObj('A user has left'));
+        // io.emit('message', generateMessageObj('A user has left'));
     });
 });
 
