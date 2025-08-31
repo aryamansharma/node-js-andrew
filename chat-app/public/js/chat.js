@@ -5,10 +5,12 @@ const inputField = document.querySelector('#inputField');
 const sendBtn = document.querySelector('#sendBtn');
 const sendLocationBtn = document.querySelector('#send-location');
 const $message = document.querySelector('#message');
+const $sideBarElement = document.querySelector('#sidebar');
 
 // Templates
 const $messageTemplate = document.querySelector('#message-template').innerHTML;
 const $locationMessageTemplate = document.querySelector('#location-msg-template').innerHTML;
+const $sidebarTemplate = document.querySelector('#sidebar-template').innerHTML;
 
 // Options
 // this QA is a library for parsing the query string from the URL into an object
@@ -76,6 +78,14 @@ socket.on('locationMessage', (urlObj) => {
         createdAt: moment(urlObj.createdAt).format('h:mm a')
     });
     $message.insertAdjacentHTML('beforeend', html);
+});
+
+socket.on('roomData', ({ room, users }) => {
+    const html = Mustache.render($sidebarTemplate, {
+        room,
+        users
+    });
+    $sideBarElement.innerHTML = html;
 });
 
 // sending event for joining a room

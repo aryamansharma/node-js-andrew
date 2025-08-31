@@ -45,6 +45,11 @@ io.on('connection', (socket) => {
         // below event using the to method will emit for the specific room passed as the parameter , so it will send the message to all the members of the room except himeself
         socket.broadcast.to(user.room).emit('message', generateMessageObj('Admin', `${user.username} has joined!`));
 
+        io.to(user.room).emit('roomData', {
+            room: user.room,
+            users: getUsersInRoom(user.room)
+        });
+
         callback();
     });
 
@@ -74,6 +79,10 @@ io.on('connection', (socket) => {
 
         if (user) {
             io.to(user.room).emit('message', generateMessageObj('Admin', `${user.username} has left`));
+            io.to(user.room).emit('roomData', {
+                room: user.room,
+                users: getUsersInRoom(user.room)
+            });
         }
 
         // here we are using io.emit because the user has already left and we can just all the remaning connections of his disconnection
