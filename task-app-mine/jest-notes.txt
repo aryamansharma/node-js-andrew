@@ -1,0 +1,23 @@
+1. we can use multiple npm packages for testing our node js application. for eg : Jest, mochajs, etc. 
+    choosing which package to use for unit testing is a personal preference.
+2. in this project we will be using jest.
+3. all the packages we need to use for testing our app should be installed as a dev dependency.
+4. we create separate folder for writing test cases in our project. folder name can be anything
+5. that folder will contain all the files for test cases.
+6. each file should contain 'test.js' extension because that is how jest is going to verify that this file contaisn the test cases,
+    and it will run those test cases.
+7. each file contains 'test' method which is automatically provided by jest.
+9. writing a test case - 
+    test('<NAME OF THE TEST CASE',() => {
+        // callback to run for this case.
+
+        // if this callback throw an error meaning the test case failed, if not than that means this test case
+        // is passed.
+
+    });
+10. we need to add a script for using jest in our app, in the "scripts" property in package.json file like this - 
+    "test": "jest".
+
+    * then for running jest for running test cases we need to run "npm run test" command in the terminal.
+11. jest is a zero configuration testing framework, meaning it has almost everything configured already, 
+    we can just pass some additional options. 
